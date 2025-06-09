@@ -11,6 +11,7 @@ interface Particle {
   speedX: number;
   speedY: number;
   opacity: number;
+  life: number;
 }
 
 interface SpeechShowerProps {
@@ -28,7 +29,7 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
 }) => {
   const [particles, setParticles] = useState<Particle[]>([]);
   const particleIdRef = useRef(0);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const animationRef = useRef<number>();
 
   const colors = [
     'hsl(217, 91%, 60%)',
@@ -39,54 +40,75 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
     'hsl(35, 85%, 70%)'
   ];
 
-  const createParticle = (): Particle => ({
-    id: particleIdRef.current++,
-    x: Math.random() * window.innerWidth,
-    y: window.innerHeight + 20,
-    size: Math.random() * 8 + 4,
-    color: colors[Math.floor(Math.random() * colors.length)],
-    speedX: (Math.random() - 0.5) * 2,
-    speedY: -Math.random() * 3 - 1,
-    opacity: Math.random() * 0.7 + 0.3
-  });
+  const createParticle = (): Particle => {
+    const id = particleIdRef.current++;
+    return {
+      id,
+      x: Math.random() * window.innerWidth,
+      y: window.innerHeight + 20,
+      size: Math.random() * 6 + 3,
+      color: colors[id % colors.length],
+      speedX: (Math.random() - 0.5) * 1.5,
+      speedY: -Math.random() * 2 - 1,
+      opacity: 1,
+      life: 100
+    };
+  };
 
   useEffect(() => {
-    // Clear existing interval
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-
     if (!isSpeaking && !isListening) {
       setParticles([]);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
       return;
     }
 
-    intervalRef.current = setInterval(() => {
+    let lastTime = 0;
+    let particleTimer = 0;
+
+    const animate = (currentTime: number) => {
+      const deltaTime = currentTime - lastTime;
+      lastTime = currentTime;
+
+      particleTimer += deltaTime;
+
       setParticles(prev => {
-        const newParticles = [...prev];
+        let newParticles = [...prev];
         
-        // Add new particles
-        const particleCount = isSpeaking ? 5 : 3;
-        for (let i = 0; i < particleCount; i++) {
-          newParticles.push(createParticle());
+        // Add new particles at a controlled rate
+        const particleInterval = isSpeaking ? 150 : 250;
+        if (particleTimer >= particleInterval) {
+          const particleCount = isSpeaking ? 2 : 1;
+          for (let i = 0; i < particleCount; i++) {
+            newParticles.push(createParticle());
+          }
+          particleTimer = 0;
         }
         
         // Update existing particles
-        return newParticles
+        newParticles = newParticles
           .map(particle => ({
             ...particle,
             x: particle.x + particle.speedX,
             y: particle.y + particle.speedY,
-            opacity: particle.opacity - 0.005
+            life: particle.life - 1,
+            opacity: particle.life / 100
           }))
-          .filter(particle => particle.y > -50 && particle.opacity > 0)
-          .slice(-100); // Limit particles
+          .filter(particle => particle.life > 0 && particle.y > -50)
+          .slice(-80); // Limit particles
+
+        return newParticles;
       });
-    }, 100);
+
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
 
     return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
       }
     };
   }, [isSpeaking, isListening]);
@@ -97,7 +119,7 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
       {particles.map(particle => (
         <div
           key={particle.id}
-          className="absolute rounded-full pointer-events-none transition-all duration-100 animate-pulse-soft"
+          className="absolute rounded-full pointer-events-none"
           style={{
             left: particle.x,
             top: particle.y,
@@ -106,7 +128,7 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
             backgroundColor: particle.color,
             opacity: particle.opacity,
             filter: 'blur(1px)',
-            transform: `scale(${0.5 + particle.opacity})`
+            transform: `scale(${0.5 + particle.opacity * 0.5})`
           }}
         />
       ))}

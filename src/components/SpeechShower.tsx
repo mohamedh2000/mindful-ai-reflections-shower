@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 
 interface Particle {
@@ -27,42 +27,48 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
   onToggleSpeaking
 }) => {
   const [particles, setParticles] = useState<Particle[]>([]);
+  const particleIdRef = useRef(0);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const colors = [
+    'hsl(217, 91%, 60%)',
+    'hsl(280, 60%, 70%)',
+    'hsl(320, 70%, 75%)',
+    'hsl(180, 65%, 60%)',
+    'hsl(160, 60%, 65%)',
+    'hsl(35, 85%, 70%)'
+  ];
+
+  const createParticle = (): Particle => ({
+    id: particleIdRef.current++,
+    x: Math.random() * window.innerWidth,
+    y: window.innerHeight + 20,
+    size: Math.random() * 8 + 4,
+    color: colors[Math.floor(Math.random() * colors.length)],
+    speedX: (Math.random() - 0.5) * 2,
+    speedY: -Math.random() * 3 - 1,
+    opacity: Math.random() * 0.7 + 0.3
+  });
 
   useEffect(() => {
+    // Clear existing interval
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+
     if (!isSpeaking && !isListening) {
       setParticles([]);
       return;
     }
 
-    const colors = [
-      'hsl(217, 91%, 60%)',
-      'hsl(280, 60%, 70%)',
-      'hsl(320, 70%, 75%)',
-      'hsl(180, 65%, 60%)',
-      'hsl(160, 60%, 65%)',
-      'hsl(35, 85%, 70%)'
-    ];
-
-    const createParticle = (id: number): Particle => ({
-      id,
-      x: Math.random() * window.innerWidth,
-      y: window.innerHeight + 20,
-      size: Math.random() * 8 + 4,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      speedX: (Math.random() - 0.5) * 2,
-      speedY: -Math.random() * 3 - 1,
-      opacity: Math.random() * 0.7 + 0.3
-    });
-
-    let particleId = 0;
-    const interval = setInterval(() => {
+    intervalRef.current = setInterval(() => {
       setParticles(prev => {
         const newParticles = [...prev];
         
         // Add new particles
         const particleCount = isSpeaking ? 5 : 3;
         for (let i = 0; i < particleCount; i++) {
-          newParticles.push(createParticle(particleId++));
+          newParticles.push(createParticle());
         }
         
         // Update existing particles
@@ -78,7 +84,11 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
       });
     }, 100);
 
-    return () => clearInterval(interval);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
   }, [isSpeaking, isListening]);
 
   return (

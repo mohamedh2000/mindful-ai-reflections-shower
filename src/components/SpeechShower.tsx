@@ -1,6 +1,6 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
+import WaveformGraph from './WaveformGraph';
 
 interface Particle {
   id: number;
@@ -133,18 +133,18 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
         />
       ))}
       
-      {/* Central AI Avatar */}
+      {/* Central Waveform Graph */}
       <div className="absolute inset-0 flex items-center justify-center">
         <div className={`relative transition-all duration-500 ${isSpeaking ? 'scale-110' : 'scale-100'}`}>
-          <div className={`w-32 h-32 rounded-full therapy-gradient flex items-center justify-center shadow-2xl
+          <div className={`p-8 rounded-2xl therapy-gradient-soft flex items-center justify-center shadow-2xl
             ${isSpeaking ? 'animate-pulse-soft' : ''} 
             ${isListening ? 'ring-4 ring-therapy-blue ring-opacity-50' : ''}`}>
-            <div className="text-4xl">🤖</div>
+            <WaveformGraph isSpeaking={isSpeaking} isListening={isListening} />
           </div>
           
           {/* Ripple effect when speaking */}
           {isSpeaking && (
-            <div className="absolute inset-0 rounded-full therapy-gradient opacity-30 animate-ping" />
+            <div className="absolute inset-0 rounded-2xl therapy-gradient opacity-20 animate-ping" />
           )}
         </div>
       </div>

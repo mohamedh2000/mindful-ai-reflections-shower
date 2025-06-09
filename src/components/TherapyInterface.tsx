@@ -1,9 +1,9 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { LogOut, Settings, Heart } from 'lucide-react';
 import SpeechShower from './SpeechShower';
+import TranscriptionPanel from './TranscriptionPanel';
 
 interface TherapyInterfaceProps {
   onLogout: () => void;
@@ -68,22 +68,13 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
         />
       </div>
 
-      {/* Session info card */}
-      <Card className="absolute bottom-6 right-6 w-64 bg-white/80 backdrop-blur-sm border-white/50">
-        <CardContent className="p-4">
-          <h3 className="font-medium text-sm text-foreground mb-2">Today's Session</h3>
-          <div className="space-y-2 text-xs text-muted-foreground">
-            <div className="flex justify-between">
-              <span>Duration:</span>
-              <span>0:00</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Status:</span>
-              <span className="text-therapy-green">Active</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Transcription panel */}
+      <div className="absolute bottom-6 right-6">
+        <TranscriptionPanel
+          isListening={isListening}
+          isSpeaking={isSpeaking}
+        />
+      </div>
     </div>
   );
 };

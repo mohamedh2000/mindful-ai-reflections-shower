@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -24,7 +25,7 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
   };
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen flex flex-col">
       {/* Header */}
       <header className="absolute top-0 left-0 right-0 z-10 p-6">
         <div className="flex justify-between items-center">
@@ -58,8 +59,8 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
         </div>
       </header>
 
-      {/* Main therapy area with speech shower */}
-      <div className="pt-20 h-screen">
+      {/* Main therapy area with speech shower - takes up 90% of screen */}
+      <div className="flex-1 pt-20" style={{ height: '90vh' }}>
         <SpeechShower
           isListening={isListening}
           isSpeaking={isSpeaking}
@@ -68,8 +69,8 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
         />
       </div>
 
-      {/* Transcription panel */}
-      <div className="absolute bottom-6 right-6">
+      {/* Transcription panel - takes up 10% of screen height and full width */}
+      <div className="w-full" style={{ height: '10vh' }}>
         <TranscriptionPanel
           isListening={isListening}
           isSpeaking={isSpeaking}

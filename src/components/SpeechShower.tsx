@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import WaveformGraph from './WaveformGraph';
 
 interface Particle {
@@ -147,31 +146,6 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
             <div className="absolute inset-0 rounded-2xl therapy-gradient opacity-20 animate-ping" />
           )}
         </div>
-      </div>
-      
-      {/* Control buttons */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-4">
-        <button
-          onClick={onToggleListening}
-          className={`p-4 rounded-full transition-all duration-300 shadow-lg ${
-            isListening 
-              ? 'bg-red-500 hover:bg-red-600 text-white' 
-              : 'bg-white hover:bg-gray-50 text-therapy-blue border-2 border-therapy-blue'
-          }`}
-        >
-          {isListening ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
-        </button>
-        
-        <button
-          onClick={onToggleSpeaking}
-          className={`p-4 rounded-full transition-all duration-300 shadow-lg ${
-            isSpeaking 
-              ? 'bg-therapy-purple hover:bg-therapy-purple/80 text-white' 
-              : 'bg-white hover:bg-gray-50 text-therapy-purple border-2 border-therapy-purple'
-          }`}
-        >
-          {isSpeaking ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
-        </button>
       </div>
       
       {/* Status text */}

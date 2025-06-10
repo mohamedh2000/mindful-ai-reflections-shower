@@ -1,6 +1,4 @@
-
 import React, { useState, useEffect, useRef } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 interface TranscriptionEntry {
@@ -71,52 +69,49 @@ const TranscriptionPanel: React.FC<TranscriptionPanelProps> = ({ isListening, is
   };
 
   return (
-    <Card className="w-80 bg-white/80 backdrop-blur-sm border-white/50">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-medium text-foreground">
-          Session Transcript
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-0">
-        <ScrollArea className="h-64 px-4">
-          <div ref={scrollRef} className="space-y-3">
-            {transcriptions.map((entry) => (
-              <div key={entry.id} className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className={`text-xs font-medium ${
-                    entry.type === 'ai' ? 'text-therapy-purple' : 'text-therapy-blue'
-                  }`}>
-                    {entry.type === 'ai' ? 'AI Therapist' : 'You'}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {formatTime(entry.timestamp)}
-                  </span>
-                </div>
-                <p className="text-sm text-foreground leading-relaxed">
-                  {entry.text}
-                </p>
+    <div className="w-full h-full bg-white/90 backdrop-blur-sm border-t border-white/50 px-6 py-2">
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="text-sm font-medium text-foreground">Session Transcript</h3>
+      </div>
+      
+      <ScrollArea className="h-full">
+        <div ref={scrollRef} className="flex space-x-6 overflow-x-auto">
+          {transcriptions.map((entry) => (
+            <div key={entry.id} className="flex-shrink-0 min-w-64 space-y-1">
+              <div className="flex items-center justify-between">
+                <span className={`text-xs font-medium ${
+                  entry.type === 'ai' ? 'text-therapy-purple' : 'text-therapy-blue'
+                }`}>
+                  {entry.type === 'ai' ? 'AI Therapist' : 'You'}
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {formatTime(entry.timestamp)}
+                </span>
               </div>
-            ))}
-            
-            {currentUserText && (
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-therapy-blue">
-                    You
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    {formatTime(new Date())}
-                  </span>
-                </div>
-                <p className="text-sm text-muted-foreground italic">
-                  {currentUserText}
-                </p>
+              <p className="text-sm text-foreground leading-relaxed">
+                {entry.text}
+              </p>
+            </div>
+          ))}
+          
+          {currentUserText && (
+            <div className="flex-shrink-0 min-w-64 space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-medium text-therapy-blue">
+                  You
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  {formatTime(new Date())}
+                </span>
               </div>
-            )}
-          </div>
-        </ScrollArea>
-      </CardContent>
-    </Card>
+              <p className="text-sm text-muted-foreground italic">
+                {currentUserText}
+              </p>
+            </div>
+          )}
+        </div>
+      </ScrollArea>
+    </div>
   );
 };
 

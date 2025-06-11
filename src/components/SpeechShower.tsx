@@ -1,5 +1,7 @@
 
 import React from 'react';
+import { Button } from '@/components/ui/button';
+import { Mic, Volume2 } from 'lucide-react';
 import WaveformGraph from './WaveformGraph';
 
 interface SpeechShowerProps {
@@ -42,6 +44,29 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
              "How are you feeling today?"}
           </p>
         </div>
+      </div>
+
+      {/* Control buttons */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-4">
+        <Button
+          onClick={onToggleListening}
+          variant={isListening ? "default" : "outline"}
+          size="lg"
+          className={`rounded-full ${isListening ? 'bg-therapy-blue hover:bg-therapy-blue/90' : ''}`}
+        >
+          <Mic className="w-5 h-5 mr-2" />
+          {isListening ? 'Stop Listening' : 'Start Listening'}
+        </Button>
+        
+        <Button
+          onClick={onToggleSpeaking}
+          variant={isSpeaking ? "default" : "outline"}
+          size="lg"
+          className={`rounded-full ${isSpeaking ? 'bg-therapy-purple hover:bg-therapy-purple/90' : ''}`}
+        >
+          <Volume2 className="w-5 h-5 mr-2" />
+          {isSpeaking ? 'Stop Speaking' : 'Start Speaking'}
+        </Button>
       </div>
     </div>
   );

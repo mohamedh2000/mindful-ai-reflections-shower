@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { LogOut, Settings, Heart } from 'lucide-react';
 import SpeechShower from './SpeechShower';
-import TranscriptionPanel from './TranscriptionPanel';
 
 interface TherapyInterfaceProps {
   onLogout: () => void;
@@ -25,7 +24,7 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen relative">
       {/* Header */}
       <header className="absolute top-0 left-0 right-0 z-10 p-6">
         <div className="flex justify-between items-center">
@@ -59,8 +58,8 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
         </div>
       </header>
 
-      {/* Main therapy area with speech shower - takes up 90% of screen */}
-      <div className="flex-1 pt-20" style={{ height: '90vh' }}>
+      {/* Main therapy area with speech shower */}
+      <div className="pt-20 h-screen">
         <SpeechShower
           isListening={isListening}
           isSpeaking={isSpeaking}
@@ -69,13 +68,22 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
         />
       </div>
 
-      {/* Transcription panel - takes up 10% of screen height and full width */}
-      <div className="w-full" style={{ height: '10vh' }}>
-        <TranscriptionPanel
-          isListening={isListening}
-          isSpeaking={isSpeaking}
-        />
-      </div>
+      {/* Session info card */}
+      <Card className="absolute bottom-6 right-6 w-64 bg-white/80 backdrop-blur-sm border-white/50">
+        <CardContent className="p-4">
+          <h3 className="font-medium text-sm text-foreground mb-2">Today's Session</h3>
+          <div className="space-y-2 text-xs text-muted-foreground">
+            <div className="flex justify-between">
+              <span>Duration:</span>
+              <span>0:00</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Status:</span>
+              <span className="text-therapy-green">Active</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

@@ -1,8 +1,18 @@
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Mic, Volume2 } from 'lucide-react';
-import WaveformGraph from './WaveformGraph';
+import React, { useEffect, useState, useRef } from 'react';
+import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
+
+interface Particle {
+  id: number;
+  x: number;
+  y: number;
+  size: number;
+  color: string;
+  speedX: number;
+  speedY: number;
+  opacity: number;
+  life: number;
+}
 
 interface SpeechShowerProps {
   isListening: boolean;
@@ -17,51 +27,162 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
   onToggleListening,
   onToggleSpeaking
 }) => {
+  const [particles, setParticles] = useState<Particle[]>([]);
+  const particleIdRef = useRef(0);
+  const animationRef = useRef<number>();
+
+  const colors = [
+    'hsl(217, 91%, 60%)',
+    'hsl(280, 60%, 70%)',
+    'hsl(320, 70%, 75%)',
+    'hsl(180, 65%, 60%)',
+    'hsl(160, 60%, 65%)',
+    'hsl(35, 85%, 70%)'
+  ];
+
+  const createParticle = (): Particle => {
+    const id = particleIdRef.current++;
+    return {
+      id,
+      x: Math.random() * window.innerWidth,
+      y: window.innerHeight + 20,
+      size: Math.random() * 6 + 3,
+      color: colors[id % colors.length],
+      speedX: (Math.random() - 0.5) * 1.5,
+      speedY: -Math.random() * 2 - 1,
+      opacity: 1,
+      life: 100
+    };
+  };
+
+  useEffect(() => {
+    if (!isSpeaking && !isListening) {
+      setParticles([]);
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+      return;
+    }
+
+    let lastTime = 0;
+    let particleTimer = 0;
+
+    const animate = (currentTime: number) => {
+      const deltaTime = currentTime - lastTime;
+      lastTime = currentTime;
+
+      particleTimer += deltaTime;
+
+      setParticles(prev => {
+        let newParticles = [...prev];
+        
+        // Add new particles at a controlled rate
+        const particleInterval = isSpeaking ? 150 : 250;
+        if (particleTimer >= particleInterval) {
+          const particleCount = isSpeaking ? 2 : 1;
+          for (let i = 0; i < particleCount; i++) {
+            newParticles.push(createParticle());
+          }
+          particleTimer = 0;
+        }
+        
+        // Update existing particles
+        newParticles = newParticles
+          .map(particle => ({
+            ...particle,
+            x: particle.x + particle.speedX,
+            y: particle.y + particle.speedY,
+            life: particle.life - 1,
+            opacity: particle.life / 100
+          }))
+          .filter(particle => particle.life > 0 && particle.y > -50)
+          .slice(-80); // Limit particles
+
+        return newParticles;
+      });
+
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+      }
+    };
+  }, [isSpeaking, isListening]);
+
   return (
-    <div className="relative w-full h-full overflow-hidden" style={{ backgroundColor: 'hsl(35, 45%, 92%)' }}>
-      {/* Central Waveform Graph */}
+    <div className="relative w-full h-full overflow-hidden">
+      {/* Particles */}
+      {particles.map(particle => (
+        <div
+          key={particle.id}
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            left: particle.x,
+            top: particle.y,
+            width: particle.size,
+            height: particle.size,
+            backgroundColor: particle.color,
+            opacity: particle.opacity,
+            filter: 'blur(1px)',
+            transform: `scale(${0.5 + particle.opacity * 0.5})`
+          }}
+        />
+      ))}
+      
+      {/* Central AI Avatar */}
       <div className="absolute inset-0 flex items-center justify-center">
         <div className={`relative transition-all duration-500 ${isSpeaking ? 'scale-110' : 'scale-100'}`}>
-          <div className={`p-8 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-xl border border-white/30
+          <div className={`w-32 h-32 rounded-full therapy-gradient flex items-center justify-center shadow-2xl
             ${isSpeaking ? 'animate-pulse-soft' : ''} 
-            ${isListening ? 'ring-4 ring-blue-400 ring-opacity-50' : ''}`}>
-            <WaveformGraph isSpeaking={isSpeaking} isListening={isListening} />
+            ${isListening ? 'ring-4 ring-therapy-blue ring-opacity-50' : ''}`}>
+            <div className="text-4xl">🤖</div>
           </div>
+          
+          {/* Ripple effect when speaking */}
+          {isSpeaking && (
+            <div className="absolute inset-0 rounded-full therapy-gradient opacity-30 animate-ping" />
+          )}
         </div>
+      </div>
+      
+      {/* Control buttons */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-4">
+        <button
+          onClick={onToggleListening}
+          className={`p-4 rounded-full transition-all duration-300 shadow-lg ${
+            isListening 
+              ? 'bg-red-500 hover:bg-red-600 text-white' 
+              : 'bg-white hover:bg-gray-50 text-therapy-blue border-2 border-therapy-blue'
+          }`}
+        >
+          {isListening ? <MicOff className="w-6 h-6" /> : <Mic className="w-6 h-6" />}
+        </button>
+        
+        <button
+          onClick={onToggleSpeaking}
+          className={`p-4 rounded-full transition-all duration-300 shadow-lg ${
+            isSpeaking 
+              ? 'bg-therapy-purple hover:bg-therapy-purple/80 text-white' 
+              : 'bg-white hover:bg-gray-50 text-therapy-purple border-2 border-therapy-purple'
+          }`}
+        >
+          {isSpeaking ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
+        </button>
       </div>
       
       {/* Status text */}
       <div className="absolute top-8 left-1/2 transform -translate-x-1/2 text-center">
-        <div className="bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full border border-white/30">
-          <p className="text-sm font-medium text-gray-700">
+        <div className="speech-bubble px-6 py-3 rounded-full">
+          <p className="text-sm font-medium text-therapy-blue">
             {isSpeaking ? "I'm here to listen and support you" : 
              isListening ? "I'm listening..." : 
              "How are you feeling today?"}
           </p>
         </div>
-      </div>
-
-      {/* Control buttons */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-4">
-        <Button
-          onClick={onToggleListening}
-          variant={isListening ? "default" : "outline"}
-          size="lg"
-          className={`rounded-full ${isListening ? 'bg-blue-500 hover:bg-blue-600' : 'bg-white/20 border-white/30 hover:bg-white/30'}`}
-        >
-          <Mic className="w-5 h-5 mr-2" />
-          {isListening ? 'Stop Listening' : 'Start Listening'}
-        </Button>
-        
-        <Button
-          onClick={onToggleSpeaking}
-          variant={isSpeaking ? "default" : "outline"}
-          size="lg"
-          className={`rounded-full ${isSpeaking ? 'bg-purple-500 hover:bg-purple-600' : 'bg-white/20 border-white/30 hover:bg-white/30'}`}
-        >
-          <Volume2 className="w-5 h-5 mr-2" />
-          {isSpeaking ? 'Stop Speaking' : 'Start Speaking'}
-        </Button>
       </div>
     </div>
   );

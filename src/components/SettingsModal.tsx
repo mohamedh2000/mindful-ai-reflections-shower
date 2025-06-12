@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -6,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { User, CreditCard, Palette, Shield, Bell, Mic, Volume2 } from 'lucide-react';
+import { useTheme } from '@/context/ThemeContext';
 
 interface SettingsModalProps {
   open: boolean;
@@ -14,10 +14,10 @@ interface SettingsModalProps {
 
 const SettingsModal: React.FC<SettingsModalProps> = ({ open, onOpenChange }) => {
   const [activeTab, setActiveTab] = useState('profile');
-  const [darkMode, setDarkMode] = useState(false);
   const [notifications, setNotifications] = useState(true);
   const [micEnabled, setMicEnabled] = useState(true);
   const [audioEnabled, setAudioEnabled] = useState(true);
+  const { theme, toggleTheme } = useTheme();
 
   const sidebarItems = [
     { id: 'profile', label: 'Profile', icon: User },
@@ -106,7 +106,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ open, onOpenChange }) => 
                   <label className="font-medium">Dark Mode</label>
                   <p className="text-sm text-muted-foreground">Switch to dark theme</p>
                 </div>
-                <Switch checked={darkMode} onCheckedChange={setDarkMode} />
+                <Switch checked={theme === 'dark'} onCheckedChange={toggleTheme} />
               </div>
               <Separator />
               <div>

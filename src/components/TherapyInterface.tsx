@@ -7,6 +7,7 @@ import SpeechShower from './SpeechShower';
 import SessionDashboard from './SessionDashboard';
 import { Room, RoomEvent } from "livekit-client";
 import { RoomContext } from "@livekit/components-react";
+import { useRoom } from '@/context/RoomContext';
 
 interface TherapyInterfaceProps {
   onLogout: () => void;
@@ -15,12 +16,17 @@ interface TherapyInterfaceProps {
 const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const { room, setRoom } = useRoom();
 
-  // LiveKit agent/connection setup
-  const [room] = useState(new Room());
+  useEffect(() => {
+    if (!room) {
+      setRoom(new Room());
+    }
+  }, [room, setRoom]);
 
 
   useEffect(() => {
+    if (!room) return;
     function onDeviceFailure(error: Error) {
       console.error(error);
       alert(
@@ -32,6 +38,11 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
       room.off(RoomEvent.MediaDevicesError, onDeviceFailure);
     };
   }, [room]);
+
+  const handleLogout = () => {
+    if (room) room.disconnect();
+    onLogout();
+  };
 
   const handleToggleListening = () => {
     setIsListening(!isListening);
@@ -75,7 +86,7 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={onLogout}
+                    onClick={handleLogout}
                     className="text-muted-foreground hover:text-foreground"
                   >
                     <LogOut className="w-4 h-4" />

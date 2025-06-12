@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -5,6 +6,7 @@ import { LogOut, Settings, Heart } from 'lucide-react';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import SpeechShower from './SpeechShower';
 import SessionDashboard from './SessionDashboard';
+import SettingsModal from './SettingsModal';
 import { Room, RoomEvent } from "livekit-client";
 import { RoomContext } from "@livekit/components-react";
 import { useRoom } from '@/context/RoomContext';
@@ -16,6 +18,7 @@ interface TherapyInterfaceProps {
 const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const { room, setRoom } = useRoom();
 
   useEffect(() => {
@@ -79,6 +82,7 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
                   <Button
                     variant="ghost"
                     size="sm"
+                    onClick={() => setSettingsOpen(true)}
                     className="text-muted-foreground hover:text-foreground"
                   >
                     <Settings className="w-4 h-4" />
@@ -94,8 +98,6 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
                 </div>
               </div>
             </header>
-
-
 
             {/* Main therapy area with speech shower */}
             <div className="pt-20 h-screen">
@@ -126,6 +128,8 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
             </Card>
           </div>
         </div>
+
+        <SettingsModal open={settingsOpen} onOpenChange={setSettingsOpen} />
       </SidebarProvider>
     </RoomContext.Provider>
   );

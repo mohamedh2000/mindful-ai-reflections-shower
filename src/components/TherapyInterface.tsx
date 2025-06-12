@@ -23,8 +23,6 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const { room, setRoom } = useRoom();
 
-
-
   const { isSignedIn, isLoaded, user } = useUser();
   console.log("isSignedIn:", isSignedIn, "isLoaded:", isLoaded, "user:", user);
 

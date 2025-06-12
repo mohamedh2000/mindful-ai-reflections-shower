@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import LoginScreen from '@/components/LoginScreen';
 import TherapyInterface from '@/components/TherapyInterface';
 import { RoomProvider } from '@/context/RoomContext';
+import { SignedIn, SignedOut } from '@clerk/clerk-react'
+import { useUser } from "@clerk/clerk-react";
 
 const Index = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  };
+  const { isSignedIn, isLoaded, user } = useUser();
+  console.log("isSignedIn:", isSignedIn, "isLoaded:", isLoaded, "user:", user);
 
   const handleLogout = () => {
     setIsLoggedIn(false);
@@ -16,13 +16,16 @@ const Index = () => {
   };
 
   return (
-    <RoomProvider>
-      {!isLoggedIn ? (
-        <LoginScreen onLogin={handleLogin} />
-      ) : (
-        <TherapyInterface onLogout={handleLogout} />
-      )}
-    </RoomProvider>
+      <RoomProvider>
+        <SignedIn>
+          <TherapyInterface onLogout={handleLogout} />
+        </SignedIn>
+        <SignedOut>
+          <LoginScreen  />
+        </SignedOut>
+      </RoomProvider>
+    
+
   );
 };
 

@@ -8,6 +8,15 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
+    configureServer: (server: { middlewares: { use: (arg0: (req: any, res: any, next: any) => void) => void; }; }) => {
+      server.middlewares.use((req, res, next) => {
+        res.setHeader(
+          "Content-Security-Policy",
+          "default-src 'self'; connect-src 'self' https://clerk-telemetry.com;"
+        );
+        next();
+      });
+    },
   },
   plugins: [
     react(),

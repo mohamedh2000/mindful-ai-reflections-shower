@@ -8,7 +8,8 @@ import SessionDashboard from './SessionDashboard';
 import { Room, RoomEvent } from "livekit-client";
 import { RoomContext } from "@livekit/components-react";
 import { useRoom } from '@/context/RoomContext';
-
+import { useAuth } from "@clerk/clerk-react";
+import { useUser } from "@clerk/clerk-react";
 interface TherapyInterfaceProps {
   onLogout: () => void;
 }
@@ -16,7 +17,13 @@ interface TherapyInterfaceProps {
 const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const { signOut } = useAuth();
   const { room, setRoom } = useRoom();
+
+
+
+  const { isSignedIn, isLoaded, user } = useUser();
+  console.log("isSignedIn:", isSignedIn, "isLoaded:", isLoaded, "user:", user);
 
   useEffect(() => {
     if (!room) {
@@ -41,6 +48,7 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
 
   const handleLogout = () => {
     if (room) room.disconnect();
+    signOut(); // This will log out of Clerk and redirect to the sign-in page
     onLogout();
   };
 

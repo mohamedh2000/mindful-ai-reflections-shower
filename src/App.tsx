@@ -7,6 +7,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ThemeProvider } from "@/context/ThemeContext";
+import { ThemeColorProvider } from "@/context/ThemeColorContext";
+import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,46 +23,51 @@ if (!PUBLISHABLE_KEY) {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <RoomProvider>
-        <BrowserRouter>
-            <Routes>
-              {/* Public route */}
-              <Route
-                path="/"
-                element={
-                  <>
-                    <SignedOut>
-                      <LoginScreen />
-                    </SignedOut>
-                    <SignedIn>
-                      <Navigate to="/home" />
-                    </SignedIn>
-                  </>
-                }
-              />
-              {/* Protected route */}
-              <Route
-                path="/home"
-                element={
-                  <>
-                    <SignedIn>
-                      <TherapyInterface onLogout={() => {}} />
-                    </SignedIn>
-                    <SignedOut>
-                      <Navigate to="/" />
-                    </SignedOut>
-                  </>
-                }
-              />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-        </BrowserRouter>
-      </RoomProvider>
-    </TooltipProvider>
+    <ThemeProvider>
+      <ThemeColorProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <RoomProvider>
+            <BrowserRouter>
+              <Routes>
+                {/* Public route */}
+                <Route
+                  path="/"
+                  element={
+                    <>
+                      <SignedOut>
+                        <LoginScreen />
+                      </SignedOut>
+                      <SignedIn>
+                        <Navigate to="/home" />
+                      </SignedIn>
+                    </>
+                  }
+                />
+                {/* Protected route */}
+                <Route
+                  path="/home"
+                  element={
+                    <>
+                      <SignedIn>
+                        <TherapyInterface onLogout={() => { }} />
+                      </SignedIn>
+                      <SignedOut>
+                        <Navigate to="/" />
+                      </SignedOut>
+                    </>
+                  }
+                />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </RoomProvider>
+        </TooltipProvider>
+      </ThemeColorProvider>
+    </ThemeProvider>
+
   </QueryClientProvider>
 );
 

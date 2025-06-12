@@ -45,7 +45,7 @@
     --therapy-orange: 35 85% 70%;
     --therapy-teal: 180 65% 60%;
 
-    --sidebar-background: 0 0% 98%;
+    --sidebar-background: 240 5% 96%;
     --sidebar-foreground: 240 5.3% 26.1%;
     --sidebar-primary: 240 5.9% 10%;
     --sidebar-primary-foreground: 0 0% 98%;
@@ -75,6 +75,98 @@
     --border: 240 4% 16%;
     --input: 240 4% 16%;
     --ring: 217 91% 60%;
+
+    /* Dark mode sidebar colors */
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 240 4.8% 95.9%;
+    --sidebar-primary-foreground: 240 5.9% 10%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Dark mode therapeutic colors */
+    --therapy-blue: 217 91% 70%;
+    --therapy-purple: 280 60% 80%;
+    --therapy-pink: 320 70% 85%;
+    --therapy-green: 160 60% 75%;
+    --therapy-orange: 35 85% 80%;
+    --therapy-teal: 180 65% 70%;
+  }
+
+  /* Theme color overrides */
+  .theme-purple {
+    --primary: 280 60% 70%;
+    --ring: 280 60% 70%;
+    --accent: 280 60% 70%;
+  }
+
+  .theme-blue {
+    --primary: 217 91% 60%;
+    --ring: 217 91% 60%;
+    --accent: 217 91% 60%;
+  }
+
+  .theme-green {
+    --primary: 160 60% 65%;
+    --ring: 160 60% 65%;
+    --accent: 160 60% 65%;
+  }
+
+  .theme-pink {
+    --primary: 320 70% 75%;
+    --ring: 320 70% 75%;
+    --accent: 320 70% 75%;
+  }
+
+  .theme-orange {
+    --primary: 35 85% 70%;
+    --ring: 35 85% 70%;
+    --accent: 35 85% 70%;
+  }
+
+  .theme-teal {
+    --primary: 180 65% 60%;
+    --ring: 180 65% 60%;
+    --accent: 180 65% 60%;
+  }
+
+  /* Dark mode theme color overrides */
+  .dark.theme-purple {
+    --primary: 280 60% 80%;
+    --ring: 280 60% 80%;
+    --accent: 280 60% 80%;
+  }
+
+  .dark.theme-blue {
+    --primary: 217 91% 70%;
+    --ring: 217 91% 70%;
+    --accent: 217 91% 70%;
+  }
+
+  .dark.theme-green {
+    --primary: 160 60% 75%;
+    --ring: 160 60% 75%;
+    --accent: 160 60% 75%;
+  }
+
+  .dark.theme-pink {
+    --primary: 320 70% 85%;
+    --ring: 320 70% 85%;
+    --accent: 320 70% 85%;
+  }
+
+  .dark.theme-orange {
+    --primary: 35 85% 80%;
+    --ring: 35 85% 80%;
+    --accent: 35 85% 80%;
+  }
+
+  .dark.theme-teal {
+    --primary: 180 65% 70%;
+    --ring: 180 65% 70%;
+    --accent: 180 65% 70%;
   }
 }
 
@@ -90,6 +182,14 @@
       hsl(240 25% 96%) 50%, 
       hsl(280 20% 98%) 100%);
     min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  .dark body {
+    background: linear-gradient(135deg, 
+      hsl(var(--background)) 0%, 
+      hsl(240 15% 6%) 50%, 
+      hsl(280 10% 8%) 100%);
   }
 }
 
@@ -112,12 +212,26 @@
       hsla(160, 60%, 65%, 0.1) 100%);
   }
 
+  .dark .therapy-gradient-soft {
+    background: linear-gradient(135deg, 
+      hsla(217, 91%, 70%, 0.15) 0%, 
+      hsla(280, 60%, 80%, 0.15) 25%,
+      hsla(320, 70%, 85%, 0.15) 50%,
+      hsla(180, 65%, 70%, 0.15) 75%,
+      hsla(160, 60%, 75%, 0.15) 100%);
+  }
+
   .floating-particle {
     position: absolute;
     border-radius: 50%;
     pointer-events: none;
     opacity: 0.6;
     filter: blur(1px);
+    transition: opacity 0.3s ease;
+  }
+
+  .dark .floating-particle {
+    opacity: 0.4;
   }
 
   .speech-bubble {
@@ -127,6 +241,15 @@
       hsla(320, 70%, 75%, 0.2) 100%);
     backdrop-filter: blur(10px);
     border: 1px solid hsla(217, 91%, 60%, 0.2);
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+  }
+
+  .dark .speech-bubble {
+    background: linear-gradient(135deg, 
+      hsla(217, 91%, 70%, 0.25) 0%, 
+      hsla(280, 60%, 80%, 0.25) 50%,
+      hsla(320, 70%, 85%, 0.25) 100%);
+    border: 1px solid hsla(217, 91%, 70%, 0.25);
   }
 }
 

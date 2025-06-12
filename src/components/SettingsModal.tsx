@@ -6,6 +6,7 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { User, CreditCard, Palette, Shield, Bell, Mic, Volume2 } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
+import { useThemeColor } from '@/context/ThemeColorContext';
 
 interface SettingsModalProps {
   open: boolean;
@@ -18,6 +19,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ open, onOpenChange }) => 
   const [micEnabled, setMicEnabled] = useState(true);
   const [audioEnabled, setAudioEnabled] = useState(true);
   const { theme, toggleTheme } = useTheme();
+  const { themeColor, setThemeColor } = useThemeColor();
 
   const sidebarItems = [
     { id: 'profile', label: 'Profile', icon: User },
@@ -28,8 +30,54 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ open, onOpenChange }) => 
     { id: 'audio', label: 'Audio Settings', icon: Volume2 },
   ];
 
+  const themeColors = [
+    { name: 'purple', class: 'bg-therapy-purple', label: 'Purple' },
+    { name: 'blue', class: 'bg-therapy-blue', label: 'Blue' },
+    { name: 'green', class: 'bg-therapy-green', label: 'Green' },
+    { name: 'pink', class: 'bg-therapy-pink', label: 'Pink' },
+    { name: 'orange', class: 'bg-therapy-orange', label: 'Orange' },
+    { name: 'teal', class: 'bg-therapy-teal', label: 'Teal' },
+  ];
+
   const renderContent = () => {
     switch (activeTab) {
+      case 'appearance':
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Appearance</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <label className="font-medium">Dark Mode</label>
+                  <p className="text-sm text-muted-foreground">Switch to dark theme</p>
+                </div>
+                <Switch checked={theme === 'dark'} onCheckedChange={toggleTheme} />
+              </div>
+              <Separator />
+              <div>
+                <label className="font-medium">Theme Color</label>
+                <p className="text-sm text-muted-foreground mb-3">Choose your preferred accent color</p>
+                <div className="flex gap-3 flex-wrap">
+                  {themeColors.map((color) => (
+                    <button
+                      key={color.name}
+                      onClick={() => setThemeColor(color.name as any)}
+                      className={`w-10 h-10 ${color.class} rounded-full cursor-pointer border-4 transition-all hover:scale-110 ${
+                        themeColor === color.name 
+                          ? 'border-foreground shadow-lg' 
+                          : 'border-white dark:border-gray-700 shadow-md'
+                      }`}
+                      title={color.label}
+                    />
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        );
+
       case 'profile':
         return (
           <Card>
@@ -90,34 +138,6 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ open, onOpenChange }) => 
                 </div>
               </div>
               <Button className="w-full">Upgrade Plan</Button>
-            </CardContent>
-          </Card>
-        );
-
-      case 'appearance':
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle>Appearance</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <label className="font-medium">Dark Mode</label>
-                  <p className="text-sm text-muted-foreground">Switch to dark theme</p>
-                </div>
-                <Switch checked={theme === 'dark'} onCheckedChange={toggleTheme} />
-              </div>
-              <Separator />
-              <div>
-                <label className="font-medium">Theme Color</label>
-                <div className="flex gap-2 mt-2">
-                  <div className="w-8 h-8 bg-therapy-purple rounded-full cursor-pointer border-2 border-white shadow-md"></div>
-                  <div className="w-8 h-8 bg-blue-500 rounded-full cursor-pointer border-2 border-white shadow-md"></div>
-                  <div className="w-8 h-8 bg-green-500 rounded-full cursor-pointer border-2 border-white shadow-md"></div>
-                  <div className="w-8 h-8 bg-pink-500 rounded-full cursor-pointer border-2 border-white shadow-md"></div>
-                </div>
-              </div>
             </CardContent>
           </Card>
         );

@@ -94,6 +94,80 @@
     --therapy-orange: 35 85% 80%;
     --therapy-teal: 180 65% 70%;
   }
+
+  /* Theme color overrides */
+  .theme-purple {
+    --primary: 280 60% 70%;
+    --ring: 280 60% 70%;
+    --accent: 280 60% 70%;
+  }
+
+  .theme-blue {
+    --primary: 217 91% 60%;
+    --ring: 217 91% 60%;
+    --accent: 217 91% 60%;
+  }
+
+  .theme-green {
+    --primary: 160 60% 65%;
+    --ring: 160 60% 65%;
+    --accent: 160 60% 65%;
+  }
+
+  .theme-pink {
+    --primary: 320 70% 75%;
+    --ring: 320 70% 75%;
+    --accent: 320 70% 75%;
+  }
+
+  .theme-orange {
+    --primary: 35 85% 70%;
+    --ring: 35 85% 70%;
+    --accent: 35 85% 70%;
+  }
+
+  .theme-teal {
+    --primary: 180 65% 60%;
+    --ring: 180 65% 60%;
+    --accent: 180 65% 60%;
+  }
+
+  /* Dark mode theme color overrides */
+  .dark.theme-purple {
+    --primary: 280 60% 80%;
+    --ring: 280 60% 80%;
+    --accent: 280 60% 80%;
+  }
+
+  .dark.theme-blue {
+    --primary: 217 91% 70%;
+    --ring: 217 91% 70%;
+    --accent: 217 91% 70%;
+  }
+
+  .dark.theme-green {
+    --primary: 160 60% 75%;
+    --ring: 160 60% 75%;
+    --accent: 160 60% 75%;
+  }
+
+  .dark.theme-pink {
+    --primary: 320 70% 85%;
+    --ring: 320 70% 85%;
+    --accent: 320 70% 85%;
+  }
+
+  .dark.theme-orange {
+    --primary: 35 85% 80%;
+    --ring: 35 85% 80%;
+    --accent: 35 85% 80%;
+  }
+
+  .dark.theme-teal {
+    --primary: 180 65% 70%;
+    --ring: 180 65% 70%;
+    --accent: 180 65% 70%;
+  }
 }
 
 @layer base {
@@ -227,4 +301,3 @@
 .animate-slide-up {
   animation: slide-up 0.6s ease-out;
 }
-

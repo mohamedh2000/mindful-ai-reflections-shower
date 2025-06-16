@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -261,14 +262,14 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ open, onOpenChange }) => 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl h-[60vh] p-0">
-        <DialogHeader className="px-6 py-2 border-b">
+      <DialogContent className="max-w-4xl h-[60vh] p-0 flex flex-col">
+        <DialogHeader className="px-6 py-2 border-b flex-shrink-0">
           <DialogTitle>Settings</DialogTitle>
         </DialogHeader>
         
-        <div className="flex h-full">
+        <div className="flex h-full min-h-0">
           {/* Sidebar */}
-          <div className="w-64 border-r bg-muted/30 p-4">
+          <div className="w-64 border-r bg-muted/30 p-4 flex-shrink-0">
             <nav className="space-y-2">
               {sidebarItems.map((item) => {
                 const Icon = item.icon;

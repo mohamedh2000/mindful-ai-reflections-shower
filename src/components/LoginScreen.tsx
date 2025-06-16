@@ -35,11 +35,11 @@ const LoginScreen = () => {
 
       {/* Centered SignIn modal/card below header */}
       <div className="flex flex-col items-center justify-center w-full z-10">
-        <div className="px-6 pb-6 group">
+        <div className="px-6 pb-6">
           <SignIn
             appearance={{
               elements: {
-                card: "bg-transparent border-none shadow-none transition-colors duration-300 group-hover:bg-white",
+                card: "bg-white rounded-2xl shadow-2xl border border-gray-200 p-8",
                 header: "hidden",
                 headerTitle: "hidden",
                 headerSubtitle: "hidden",
@@ -47,6 +47,9 @@ const LoginScreen = () => {
               },
               variables: {
                 colorPrimary: "#a259ff",
+                colorText: "#18122B",
+                colorInputBackground: "#f7f7fa",
+                colorInputText: "#18122B",
               },
             }}
             oauthFlow="popup"

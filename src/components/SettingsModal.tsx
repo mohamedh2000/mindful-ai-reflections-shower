@@ -107,7 +107,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ open, onOpenChange }) => 
               <div>
                 <label className="text-sm font-medium">Therapy Goals</label>
                 <textarea 
-                  className="w-full mt-1 px-3 py-2 border rounded-md h-24"
+                  className="w-full mt-1 px-3 py-2 border rounded-md h-12"
                   placeholder="What would you like to work on?"
                 />
               </div>

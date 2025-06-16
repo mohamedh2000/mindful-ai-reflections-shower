@@ -169,7 +169,7 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
       {/* Connect Button */}
       {!connected ? (
         <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20">
-          <Button onClick={onConnectButtonClicked} className="px-6 py-2 rounded-xl bg-blue-600 text-white">
+          <Button onClick={onConnectButtonClicked} className="px-6 py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90">
             Connect to LiveKit
           </Button>
         </div>

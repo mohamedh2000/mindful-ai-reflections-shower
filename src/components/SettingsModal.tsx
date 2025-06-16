@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -292,7 +293,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ open, onOpenChange }) => 
           </div>
 
           {/* Content */}
-          <div className="flex-1 p-6 overflow-auto">
+          <div className="flex-1 p-4 overflow-auto">
             {renderContent()}
           </div>
         </div>
@@ -302,3 +303,4 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ open, onOpenChange }) => 
 };
 
 export default SettingsModal;
+

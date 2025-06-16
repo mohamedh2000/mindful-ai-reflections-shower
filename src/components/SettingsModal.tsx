@@ -31,12 +31,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ open, onOpenChange }) => 
   ];
 
   const themeColors = [
-    { name: 'purple', class: 'bg-therapy-purple', label: 'Purple' },
-    { name: 'blue', class: 'bg-therapy-blue', label: 'Blue' },
-    { name: 'green', class: 'bg-therapy-green', label: 'Green' },
-    { name: 'pink', class: 'bg-therapy-pink', label: 'Pink' },
-    { name: 'orange', class: 'bg-therapy-orange', label: 'Orange' },
-    { name: 'teal', class: 'bg-therapy-teal', label: 'Teal' },
+    { name: 'purple', style: { backgroundColor: 'hsl(280, 60%, 70%)' }, label: 'Purple' },
+    { name: 'blue', style: { backgroundColor: 'hsl(217, 91%, 60%)' }, label: 'Blue' },
+    { name: 'green', style: { backgroundColor: 'hsl(160, 60%, 65%)' }, label: 'Green' },
+    { name: 'pink', style: { backgroundColor: 'hsl(320, 70%, 75%)' }, label: 'Pink' },
+    { name: 'orange', style: { backgroundColor: 'hsl(35, 85%, 70%)' }, label: 'Orange' },
+    { name: 'teal', style: { backgroundColor: 'hsl(180, 65%, 60%)' }, label: 'Teal' },
   ];
 
   const renderContent = () => {
@@ -64,11 +64,12 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ open, onOpenChange }) => 
                     <button
                       key={color.name}
                       onClick={() => setThemeColor(color.name as any)}
-                      className={`w-10 h-10 ${color.class} rounded-full cursor-pointer border-4 transition-all hover:scale-110 ${
+                      className={`w-10 h-10 rounded-full cursor-pointer border-4 transition-all hover:scale-110 ${
                         themeColor === color.name 
                           ? 'border-foreground shadow-lg' 
                           : 'border-white dark:border-gray-700 shadow-md'
                       }`}
+                      style={color.style}
                       title={color.label}
                     />
                   ))}
@@ -261,7 +262,7 @@ const SettingsModal: React.FC<SettingsModalProps> = ({ open, onOpenChange }) => 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl h-[80vh] p-0">
-        <DialogHeader className="px-6 py-4 border-b">
+        <DialogHeader className="px-6 py-3 border-b">
           <DialogTitle>Settings</DialogTitle>
         </DialogHeader>
         

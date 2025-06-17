@@ -76,7 +76,7 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
                 <div className="flex items-center space-x-3">
                   <SidebarTrigger />
                   <div className="w-10 h-10 rounded-full therapy-gradient flex items-center justify-center">
-                    <Heart className="w-5 h-5 text-white" />
+                    <Heart className="w-5 h-5 text-white" fill="white" />
                   </div>
                   <div>
                     <h1 className="text-xl font-semibold text-foreground">MindSpace AI</h1>
@@ -117,7 +117,7 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
             </div>
 
             {/* Session info card */}
-            <Card className="absolute bottom-6 right-6 w-64 bg-white/80 backdrop-blur-sm border-white/50">
+            <Card className="absolute bottom-6 right-6 w-64 bg-white/80 backdrop-blur-sm border-white/50 dark:bg-gray-800/90 dark:border-gray-700/50">
               <CardContent className="p-4">
                 <h3 className="font-medium text-sm text-foreground mb-2">Today's Session</h3>
                 <div className="space-y-2 text-xs text-muted-foreground">

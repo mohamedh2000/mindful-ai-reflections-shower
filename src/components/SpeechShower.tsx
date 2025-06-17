@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
 import WaveformDisplay from './WaveformDisplay';
-import { Room } from 'livekit-client';
+import { Room, createLocalAudioTrack, LocalAudioTrack, RoomEvent, RemoteTrack, RemoteParticipant, Track } from 'livekit-client';
 import { Button } from '@/components/ui/button';
 
 interface Particle {
@@ -35,17 +35,18 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
   const particleIdRef = useRef(0);
   const animationRef = useRef<number>();
   const [connected, setConnected] = useState(false);
+  const [audioTrack, setAudioTrack] = useState<LocalAudioTrack | null>(null);
+  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
 
   const onConnectButtonClicked = useCallback(async () => {
-    const url = new URL(
-      "http://localhost:3000/api/connection-details"
-    );
+    console.log('[LiveKit] Connecting to LiveKit...');
+    const url = new URL("http://localhost:3000/api/connection-details");
     const response = await fetch(url.toString());
     const connectionDetailsData = await response.json();
-
+    console.log('[LiveKit] Connection details:', connectionDetailsData);
     await room.connect(connectionDetailsData.serverUrl, connectionDetailsData.participantToken);
-    await room.localParticipant.setMicrophoneEnabled(true);
     setConnected(true);
+    console.log('[LiveKit] Connected to room:', room.name);
   }, [room]);
 
   const colors = [
@@ -130,6 +131,91 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
     };
   }, [isSpeaking, isListening]);
 
+  useEffect(() => {
+    if (!connected || !room) return;
+
+    let localTrack: LocalAudioTrack | null = null;
+
+    const publishTrack = async () => {
+      if (isSpeaking && !audioTrack) {
+        console.log('[LiveKit] Creating local audio track...');
+        localTrack = await createLocalAudioTrack();
+        setAudioTrack(localTrack);
+        await room.localParticipant.publishTrack(localTrack);
+        setMediaStream(new MediaStream([localTrack.mediaStreamTrack]));
+        console.log('[LiveKit] Audio track published:', localTrack);
+      } else if (!isSpeaking && audioTrack) {
+        console.log('[LiveKit] Unpublishing and stopping audio track:', audioTrack);
+        room.localParticipant.unpublishTrack(audioTrack);
+        audioTrack.stop();
+        setAudioTrack(null);
+        setMediaStream(null);
+      }
+    };
+
+    publishTrack();
+
+    // Cleanup on unmount
+    return () => {
+      if (audioTrack) {
+        console.log('[LiveKit] Cleanup: Unpublishing and stopping audio track:', audioTrack);
+        room.localParticipant.unpublishTrack(audioTrack);
+        audioTrack.stop();
+        setAudioTrack(null);
+      }
+    };
+    // eslint-disable-next-line
+  }, [isSpeaking, connected, room]);
+
+  useEffect(() => {
+    if (mediaStream) {
+      console.log('[Waveform] MediaStream set for visualization:', mediaStream);
+    } else {
+      console.log('[Waveform] MediaStream cleared.');
+    }
+  }, [mediaStream]);
+
+  // LiveKit event logging
+  useEffect(() => {
+    if (!room) return;
+    const onTrackPublished = (publication, participant) => {
+      console.log('[LiveKit] trackPublished', publication, participant);
+    };
+    const onTrackSubscribed = (track: RemoteTrack, publication, participant: RemoteParticipant) => {
+      console.log('[LiveKit] trackSubscribed', track, publication, participant);
+      if (track.kind === 'audio') {
+        track.attach();
+        console.log('[LiveKit] Audio track attached for playback.');
+      }
+    };
+    const onTrackUnsubscribed = (track: RemoteTrack, publication, participant: RemoteParticipant) => {
+      console.log('[LiveKit] trackUnsubscribed', track, publication, participant);
+    };
+    const onParticipantConnected = (participant: RemoteParticipant) => {
+      console.log('[LiveKit] participantConnected', participant);
+    };
+    const onParticipantDisconnected = (participant: RemoteParticipant) => {
+      console.log('[LiveKit] participantDisconnected', participant);
+    };
+    const onTrackSubscriptionFailed = (trackSid, participant) => {
+      console.error('[LiveKit] trackSubscriptionFailed', trackSid, participant);
+    };
+    room.on(RoomEvent.TrackPublished, onTrackPublished);
+    room.on(RoomEvent.TrackSubscribed, onTrackSubscribed);
+    room.on(RoomEvent.TrackUnsubscribed, onTrackUnsubscribed);
+    room.on(RoomEvent.ParticipantConnected, onParticipantConnected);
+    room.on(RoomEvent.ParticipantDisconnected, onParticipantDisconnected);
+    room.on(RoomEvent.TrackSubscriptionFailed, onTrackSubscriptionFailed);
+    return () => {
+      room.off(RoomEvent.TrackPublished, onTrackPublished);
+      room.off(RoomEvent.TrackSubscribed, onTrackSubscribed);
+      room.off(RoomEvent.TrackUnsubscribed, onTrackUnsubscribed);
+      room.off(RoomEvent.ParticipantConnected, onParticipantConnected);
+      room.off(RoomEvent.ParticipantDisconnected, onParticipantDisconnected);
+      room.off(RoomEvent.TrackSubscriptionFailed, onTrackSubscriptionFailed);
+    };
+  }, [room]);
+
   return (
     <div className="relative w-full h-full overflow-hidden">
       {/* Particles */}
@@ -156,7 +242,7 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
           <div className={`w-40 h-32 rounded-2xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center shadow-2xl
             ${isSpeaking ? 'animate-pulse-soft' : ''} 
             ${isListening ? 'ring-4 ring-therapy-blue ring-opacity-50' : ''}`}>
-            <WaveformDisplay isListening={isListening} isSpeaking={isSpeaking} />
+            <WaveformDisplay isListening={isListening} isSpeaking={isSpeaking} mediaStream={mediaStream} />
           </div>
 
           {/* Ripple effect when speaking */}
@@ -186,7 +272,10 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
           </button>
 
           <button
-            onClick={onToggleSpeaking}
+            onClick={() => {
+              console.log('[UI] Speak button clicked');
+              onToggleSpeaking();
+            }}
             className={`p-4 rounded-full transition-all duration-300 shadow-lg ${isSpeaking
               ? 'bg-therapy-purple hover:bg-therapy-purple/80 text-white'
               : 'bg-white hover:bg-gray-50 text-therapy-purple border-2 border-therapy-purple'

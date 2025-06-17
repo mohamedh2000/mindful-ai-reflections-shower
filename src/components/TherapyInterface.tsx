@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -23,8 +22,7 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const { room, setRoom } = useRoom();
 
-  const { isSignedIn, isLoaded, user } = useUser();
-  console.log("isSignedIn:", isSignedIn, "isLoaded:", isLoaded, "user:", user);
+  const { isSignedIn, user } = useUser();
 
   useEffect(() => {
     if (!room) {
@@ -36,15 +34,18 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
     if (isSignedIn) {
       fetch('http://localhost:3000/api/user', {
         method: 'POST',
-        body: JSON.stringify({
-          userId: user?.id,
-        })
-      }).then((data) => {
-        const userData = data.json();
+        headers: {
+          'Content-Type': 'application/json', 
+        },
+        body: JSON.stringify({ userId: user?.id }),
+      }).then(async (data) => {
+        const userData = await data.json();
         console.log(userData);
-      })
+      }).catch((error) => {
+        console.error('Error fetching user data:', error);
+      });
     }
-  }, [isSignedIn]);
+  }, [isSignedIn, user?.id]);
 
 
   useEffect(() => {
@@ -75,6 +76,7 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
   const handleToggleSpeaking = () => {
     setIsSpeaking(!isSpeaking);
     if (isListening) setIsListening(false);
+    console.log('[UI] Toggled speaking:', !isSpeaking);
   };
 
   return (

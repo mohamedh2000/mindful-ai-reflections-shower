@@ -1,5 +1,6 @@
+
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { Mic, MicOff, Volume2, VolumeX } from 'lucide-react';
+import { Mic, MicOff, Volume2, VolumeX, PhoneOff } from 'lucide-react';
 import WaveformDisplay from './WaveformDisplay';
 import { Room, createLocalAudioTrack, LocalAudioTrack, RoomEvent, RemoteTrack, RemoteParticipant, Track } from 'livekit-client';
 import { Button } from '@/components/ui/button';
@@ -47,6 +48,11 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
     await room.connect(connectionDetailsData.serverUrl, connectionDetailsData.participantToken);
     setConnected(true);
     console.log('[LiveKit] Connected to room:', room.name);
+  }, [room]);
+
+  const onEndSessionClicked = useCallback(async () => {
+    await room.disconnect();
+    setConnected(false);
   }, [room]);
 
   const colors = [
@@ -282,6 +288,13 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
               }`}
           >
             {isSpeaking ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
+          </button>
+
+          <button
+            onClick={onEndSessionClicked}
+            className="p-4 rounded-full transition-all duration-300 shadow-lg bg-red-500 hover:bg-red-600 text-white"
+          >
+            <PhoneOff className="w-6 h-6" />
           </button>
         </div>
       )}

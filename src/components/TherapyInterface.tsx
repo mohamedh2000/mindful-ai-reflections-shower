@@ -32,6 +32,20 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
     }
   }, [room, setRoom]);
 
+  useEffect(() => {
+    if (isSignedIn) {
+      fetch('http://localhost:3000/api/user', {
+        method: 'POST',
+        body: JSON.stringify({
+          userId: user?.id,
+        })
+      }).then((data) => {
+        const userData = data.json();
+        console.log(userData);
+      })
+    }
+  }, [isSignedIn]);
+
 
   useEffect(() => {
     if (!room) return;

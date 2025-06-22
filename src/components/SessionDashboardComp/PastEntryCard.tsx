@@ -1,3 +1,4 @@
+
 import { ChevronRight } from 'lucide-react';
 import {
   SidebarMenuItem,
@@ -16,9 +17,10 @@ type Session = {
 
 interface PastEntryCardProps {
   session: Session;
+  onSessionClick: (session: Session) => void;
 }
 
-const PastEntryCard: React.FC<PastEntryCardProps> = ({ session }) => {
+const PastEntryCard: React.FC<PastEntryCardProps> = ({ session, onSessionClick }) => {
     // The summary comes in as a string like "{"summary one","summary two"}"
     // We need to parse it into an array.
     const summaryList = session.session_summary
@@ -27,7 +29,10 @@ const PastEntryCard: React.FC<PastEntryCardProps> = ({ session }) => {
 
     return (
         <SidebarMenuItem key={session.id}>
-        <SidebarMenuButton className="h-auto p-3">
+        <SidebarMenuButton 
+          className="h-auto p-3 cursor-pointer hover:bg-accent"
+          onClick={() => onSessionClick(session)}
+        >
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between mb-1">
               <span className="text-xs text-muted-foreground">

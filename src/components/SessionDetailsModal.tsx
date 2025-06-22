@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Dialog,
@@ -39,6 +38,38 @@ const SessionDetailsModal: React.FC<SessionDetailsModalProps> = ({
       return `${hours}h ${mins}m`;
     }
     return `${mins} minutes`;
+  };
+
+  const parseTranscript = (transcript: string) => {
+    try {
+      if (typeof transcript !== 'string' || !transcript.startsWith('{') || !transcript.endsWith('}')) {
+        return transcript;
+      }
+      const arrayContent = transcript.slice(1, -1);
+
+      // Regex to find all double-quoted strings, which handles escaped quotes within the strings.
+      const quotedStrings = arrayContent.match(/"((?:\\.|[^"\\])*)"/g);
+      
+      if (!quotedStrings) {
+        return transcript;
+      }
+
+      // Each match is a double-quoted string. We parse it to get the string content,
+      // which is itself a JSON string that we parse again.
+      const parsed = quotedStrings.map(qstr => JSON.parse(JSON.parse(qstr)));
+      
+      return parsed.map((entry: {from: string, text: string}, index: number) => (
+        <div key={index} className="mb-2">
+          <span className={`font-semibold ${entry.from === 'Agent' ? 'text-therapy-blue' : 'text-foreground'}`}>
+            {entry.from}:
+          </span>
+          <span className="ml-2 whitespace-pre-wrap">{entry.text}</span>
+        </div>
+      ));
+    } catch (error) {
+      console.error("Failed to parse transcript:", error, "Transcript:", transcript);
+      return transcript;
+    }
   };
 
   return (
@@ -94,8 +125,8 @@ const SessionDetailsModal: React.FC<SessionDetailsModalProps> = ({
           <div className="space-y-2">
             <h3 className="font-medium text-foreground">Session Transcript</h3>
             <ScrollArea className="h-64 w-full rounded-md border p-4">
-              <div className="whitespace-pre-wrap text-sm text-muted-foreground">
-                {session.session_transcript || 'No transcript available for this session.'}
+              <div className="text-sm text-muted-foreground">
+                {parseTranscript(session.session_transcript) || 'No transcript available for this session.'}
               </div>
             </ScrollArea>
           </div>

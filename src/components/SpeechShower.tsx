@@ -1,9 +1,9 @@
-
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { Mic, MicOff, Volume2, VolumeX, PhoneOff } from 'lucide-react';
 import WaveformDisplay from './WaveformDisplay';
 import { Room, createLocalAudioTrack, LocalAudioTrack, RoomEvent, RemoteTrack, RemoteParticipant, Track } from 'livekit-client';
 import { Button } from '@/components/ui/button';
+import { useUser } from '@clerk/clerk-react';
 
 interface Particle {
   id: number;
@@ -21,6 +21,8 @@ interface SpeechShowerProps {
   room: Room;
   isListening: boolean;
   isSpeaking: boolean;
+  sessionDuration: number;
+  setSessionDuration: (duration: number) => void;
   onToggleListening: () => void;
   onToggleSpeaking: () => void;
 }
@@ -29,6 +31,8 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
   room,
   isListening,
   isSpeaking,
+  sessionDuration,
+  setSessionDuration,
   onToggleListening,
   onToggleSpeaking
 }) => {
@@ -38,6 +42,10 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
   const [connected, setConnected] = useState(false);
   const [audioTrack, setAudioTrack] = useState<LocalAudioTrack | null>(null);
   const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
+  const [transcripts, setTranscripts] = useState<{ text: string, from: string }[]>([]);
+  const [transcriptHistory, setTranscriptHistory] = useState<{ text: string, from: string }[]>([]);
+  const { user } = useUser();
+  const localIdentity = room?.localParticipant?.identity;
 
   const onConnectButtonClicked = useCallback(async () => {
     console.log('[LiveKit] Connecting to LiveKit...');
@@ -48,12 +56,24 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
     await room.connect(connectionDetailsData.serverUrl, connectionDetailsData.participantToken);
     setConnected(true);
     console.log('[LiveKit] Connected to room:', room.name);
+    setSessionDuration(0); // reset on new session
   }, [room]);
 
   const onEndSessionClicked = useCallback(async () => {
+    // Send transcript to backend before disconnecting
+    try {
+      await fetch('http://localhost:3000/api/save-transcript', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transcript: transcriptHistory, userId: user.id, sessionDuration: sessionDuration}),
+      });
+      console.log('Transcript sent to backend');
+    } catch (err) {
+      console.error('Failed to send transcript:', err);
+    }
     await room.disconnect();
     setConnected(false);
-  }, [room]);
+  }, [room, transcriptHistory, user.id]);
 
   const colors = [
     'hsl(217, 91%, 60%)',
@@ -222,6 +242,80 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
     };
   }, [room]);
 
+  // Listen for transcription/data events
+  useEffect(() => {
+    if (!room) return;
+    function handleTranscription(transcription) {
+      const t = Array.isArray(transcription) ? transcription[0] : transcription;
+      console.log('Transcription event:', t);
+      console.log('Local identity:', localIdentity);
+      console.log('Participant identity:', t.participant?.identity);
+      
+      let from = 'You';
+      if (t.id?.startsWith('SG_')) {
+        from = 'Agent';
+      } else if (t.id?.startsWith('item_')) {
+        from = 'You';
+      } else if (t.participant?.identity && t.participant?.identity !== localIdentity) {
+        from = 'Agent';
+      }
+
+      setTranscripts([{ text: t.text, from }]);
+      if (t.final) {
+        setTranscriptHistory(prev => [
+          ...prev,
+          { text: t.text, from }
+        ]);
+      }
+    }
+    function handleData(payload, participant) {
+      const text = new TextDecoder().decode(payload);
+      console.log('Data event:', { text, participant });
+      console.log('Local identity:', localIdentity);
+      console.log('Participant identity:', participant?.identity);
+      
+      if (text && text.trim() !== '') {
+        const isLocalUser = participant?.identity === localIdentity;
+        console.log('Is local user?', isLocalUser);
+        
+        // For live display, show all data messages
+        setTranscripts([{ text, from: isLocalUser ? 'You' : 'Agent' }]);
+        
+        // Only add to history if it's from the agent (data messages are always final)
+        if (!isLocalUser) {
+          console.log('Adding agent data message to history:', {
+            text,
+            from: 'Agent',
+            participant: participant?.identity
+          });
+          setTranscriptHistory(prev => [
+            ...prev,
+            { text, from: 'Agent' }
+          ]);
+        }
+      }
+    }
+    room.on(RoomEvent.TranscriptionReceived, handleTranscription);
+    room.on(RoomEvent.DataReceived, handleData);
+    return () => {
+      room.off(RoomEvent.TranscriptionReceived, handleTranscription);
+      room.off(RoomEvent.DataReceived, handleData);
+    };
+  }, [localIdentity, room]);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+    if (connected) {
+      interval = setInterval(() => {
+        setSessionDuration(sessionDuration + 1);
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [connected, setSessionDuration]);
+
+
   return (
     <div className="relative w-full h-full overflow-hidden">
       {/* Particles */}
@@ -256,6 +350,13 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
             <div className="absolute inset-0 rounded-2xl bg-therapy-purple/20 animate-ping" />
           )}
         </div>
+      </div>
+
+      {/* Transcript display - now above the connect/buttons */}
+      <div className="absolute left-1/2 bottom-48 transform -translate-x-1/2 z-30 px-6 py-2 max-w-xl w-full text-xl overflow-y-auto max-h-40 text-center font-medium" style={{background: 'transparent', color: 'black'}}>
+        {transcripts.map((t, i) => (
+          <div key={i} className="mb-1">{t.text}</div>
+        ))}
       </div>
 
       {/* Connect Button */}

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Calendar, Clock, TrendingUp, Heart, ChevronRight } from 'lucide-react';
 import {
@@ -13,69 +12,21 @@ import {
 import OverviewCard from './SessionDashboardComp/OverviewCard';
 import PastEntryCard from './SessionDashboardComp/PastEntryCard';
 
-// Mock data for past sessions
-const pastSessionsMock = [
-  {
-    id: 1,
-    date: '2024-06-10',
-    duration: '45 min',
-    mood: 'Positive',
-    topics: ['Anxiety', 'Work stress']
-  },
-  {
-    id: 2,
-    date: '2024-06-08',
-    duration: '38 min',
-    mood: 'Neutral',
-    topics: ['Sleep issues', 'Goals']
-  },
-  {
-    id: 3,
-    date: '2024-06-05',
-    duration: '52 min',
-    mood: 'Challenging',
-    topics: ['Relationships', 'Self-care']
-  },
-  {
-    id: 4,
-    date: '2024-06-03',
-    duration: '41 min',
-    mood: 'Positive',
-    topics: ['Progress review', 'Mindfulness']
-  },
-  {
-    id: 5,
-    date: '2024-06-03',
-    duration: '41 min',
-    mood: 'Positive',
-    topics: ['Progress review', 'Mindfulness']
-  },
-  {
-    id: 6,
-    date: '2024-06-03',
-    duration: '41 min',
-    mood: 'Positive',
-    topics: ['Progress review', 'Mindfulness']
-  },
-  {
-    id: 7,
-    date: '2024-06-03',
-    duration: '41 min',
-    mood: 'Positive',
-    topics: ['Progress review', 'Mindfulness']
-  }, 
-  {
-    id: 8,
-    date: '2024-06-03',
-    duration: '41 min',
-    mood: 'Positive',
-    topics: ['Progress review', 'Mindfulness']
-  }
-];
+type SessionData = {
+  id: string;
+  session_date: string;
+  total_time_minutes: number;
+  session_rating: string;
+  session_summary: string;
+  session_transcript: string;
+  embedding: string;
+}
 
-const SessionDashboard: React.FC = () => {
+interface SessionDashboardProps {
+  sessionData: SessionData[];
+}
 
-  const [pastSessions, setPastSessions] = useState(pastSessionsMock);
+const SessionDashboard: React.FC<SessionDashboardProps> = ({ sessionData = [] }) => {
 
   return (
     <Sidebar style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -107,8 +58,8 @@ const SessionDashboard: React.FC = () => {
           <SidebarGroupContent style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
             <div style={{ flex: 1, overflowY: 'auto' }}>
               <SidebarMenu>
-                {pastSessions.map((session) => (
-                  <PastEntryCard session={session} />
+                {sessionData.map((session) => (
+                  <PastEntryCard key={session.id} session={session} />
                 ))}
               </SidebarMenu>
             </div>

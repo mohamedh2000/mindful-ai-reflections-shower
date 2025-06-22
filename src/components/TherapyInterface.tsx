@@ -21,6 +21,9 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
   const { signOut } = useAuth();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const { room, setRoom } = useRoom();
+  const [sessionDuration, setSessionDuration] = useState(0); // in seconds
+  const [sessionData, setSessionData] = useState([]);
+  const [userData, setUserData] = useState([]);
 
   const { isSignedIn, user } = useUser();
 
@@ -39,8 +42,10 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
         },
         body: JSON.stringify({ userId: user?.id }),
       }).then(async (data) => {
-        const userData = await data.json();
-        console.log(userData);
+        const respData = await data.json();
+        setSessionData(respData.sessionData);
+        setUserData(respData.userData);
+        console.log(respData);
       }).catch((error) => {
         console.error('Error fetching user data:', error);
       });
@@ -79,11 +84,18 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
     console.log('[UI] Toggled speaking:', !isSpeaking);
   };
 
+  const formatDuration = (seconds: number) => {
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
+
   return (
     <RoomContext.Provider value={room}>
       <SidebarProvider>
         <div className="min-h-screen flex w-full">
-          <SessionDashboard />
+          <SessionDashboard sessionData={sessionData}/>
           
           <div className="flex-1 relative">
             {/* Header */}
@@ -127,6 +139,8 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
                 room={room}
                 isListening={isListening}
                 isSpeaking={isSpeaking}
+                sessionDuration={sessionDuration}
+                setSessionDuration={setSessionDuration}
                 onToggleListening={handleToggleListening}
                 onToggleSpeaking={handleToggleSpeaking}
               />
@@ -139,7 +153,7 @@ const TherapyInterface: React.FC<TherapyInterfaceProps> = ({ onLogout }) => {
                 <div className="space-y-2 text-xs text-muted-foreground">
                   <div className="flex justify-between">
                     <span>Duration:</span>
-                    <span>0:00</span>
+                    <span>{formatDuration(sessionDuration)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Status:</span>

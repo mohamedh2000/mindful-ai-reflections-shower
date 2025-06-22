@@ -48,16 +48,64 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
   const localIdentity = room?.localParticipant?.identity;
 
   const onConnectButtonClicked = useCallback(async () => {
+    if (!user) {
+      console.error("User is not authenticated");
+      return;
+    }
     console.log('[LiveKit] Connecting to LiveKit...');
-    const url = new URL("http://localhost:3000/api/connection-details");
-    const response = await fetch(url.toString());
+    const response = await fetch("http://localhost:3000/api/connection-details", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userId: user.id }),
+    });
     const connectionDetailsData = await response.json();
     console.log('[LiveKit] Connection details:', connectionDetailsData);
+
     await room.connect(connectionDetailsData.serverUrl, connectionDetailsData.participantToken);
     setConnected(true);
     console.log('[LiveKit] Connected to room:', room.name);
+
+    if (connectionDetailsData.embeddings && connectionDetailsData.embeddings.length > 0) {
+      console.log('Sending embeddings to agent...');
+      const data = JSON.stringify({ 
+        type: 'user_embeddings', 
+        payload: connectionDetailsData.embeddings,
+        userId: user.id 
+      });
+      console.log('Data being sent:', data);
+      const encodedData = new TextEncoder().encode(data);
+      
+      try {
+        await room.localParticipant.publishData(encodedData, { reliable: true });
+        console.log('Data published successfully');
+      } catch (error) {
+        console.error('Failed to publish data:', error);
+      }
+      console.log('Embeddings and userId sent.');
+    } else {
+      // Send userId even if no embeddings
+      console.log('Sending userId to agent...');
+      const data = JSON.stringify({ 
+        type: 'user_embeddings', 
+        payload: [],
+        userId: user.id 
+      });
+      console.log('Data being sent:', data);
+      const encodedData = new TextEncoder().encode(data);
+      
+      try {
+        await room.localParticipant.publishData(encodedData, { reliable: true });
+        console.log('Data published successfully');
+      } catch (error) {
+        console.error('Failed to publish data:', error);
+      }
+      console.log('UserId sent.');
+    }
+
     setSessionDuration(0); // reset on new session
-  }, [room]);
+  }, [room, user]);
 
   const onEndSessionClicked = useCallback(async () => {
     // Send transcript to backend before disconnecting

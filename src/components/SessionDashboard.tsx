@@ -42,7 +42,7 @@ const SessionDashboard: React.FC<SessionDashboardProps> = ({ sessionData = [] })
       <Sidebar style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
         <SidebarHeader className="p-4">
           <div className="flex items-center space-x-2">
-            <Heart className="w-6 h-6 text-black dark:text-white" fill="black dark:fill-white" />
+            <Heart className="w-6 h-6 fill-primary text-primary" />
             <h2 className="text-lg font-semibold text-foreground">Session History</h2>
           </div>
         </SidebarHeader>

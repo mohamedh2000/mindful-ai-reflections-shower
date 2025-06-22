@@ -30,7 +30,7 @@ const PastEntryCard: React.FC<PastEntryCardProps> = ({ session, onSessionClick }
     return (
         <SidebarMenuItem key={session.id}>
         <SidebarMenuButton 
-          className="h-auto p-3 cursor-pointer"
+          className="h-auto p-3 cursor-pointer hover:shadow-md transition-shadow"
           onClick={() => onSessionClick(session)}
         >
           <div className="flex-1 min-w-0">

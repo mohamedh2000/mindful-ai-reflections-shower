@@ -46,6 +46,7 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
   const [transcriptHistory, setTranscriptHistory] = useState<{ text: string, from: string }[]>([]);
   const { user } = useUser();
   const localIdentity = room?.localParticipant?.identity;
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const onConnectButtonClicked = useCallback(async () => {
     if (!user) {
@@ -352,17 +353,21 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
   }, [localIdentity, room]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-    if (connected) {
-      interval = setInterval(() => {
+    if (connected && !intervalRef.current) {
+      intervalRef.current = setInterval(() => {
         setSessionDuration(sessionDuration + 1);
       }, 1000);
+    } else if (!connected && intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
     }
     return () => {
-      if (interval) clearInterval(interval);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     };
-  }, [connected, setSessionDuration]);
-
+  }, [connected, sessionDuration, setSessionDuration]);
 
   return (
     <div className="relative w-full h-full overflow-hidden">
@@ -401,7 +406,7 @@ const SpeechShower: React.FC<SpeechShowerProps> = ({
       </div>
 
       {/* Transcript display - now above the connect/buttons */}
-      <div className="absolute left-1/2 bottom-48 transform -translate-x-1/2 z-30 px-6 py-2 max-w-xl w-full text-xl overflow-y-auto max-h-40 text-center font-medium" style={{background: 'transparent', color: 'black'}}>
+      <div className="absolute left-1/2 bottom-48 transform -translate-x-1/2 z-30 px-6 py-2 max-w-xl w-full text-xl overflow-y-auto max-h-40 text-center font-medium" style={{ background: 'transparent', color: 'black' }}>
         {transcripts.map((t, i) => (
           <div key={i} className="mb-1">{t.text}</div>
         ))}

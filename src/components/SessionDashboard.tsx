@@ -54,7 +54,7 @@ const SessionDashboard: React.FC<SessionDashboardProps> = ({ sessionData = [] })
             <SidebarGroupContent className="px-2">
               <div className="grid grid-cols-1 gap-3">
 
-                <OverviewCard icon={<Calendar className="w-4 h-4 text-therapy-blue" />} metric="Total Sessions" value="12" />
+                <OverviewCard icon={<Calendar className="w-4 h-4 text-therapy-blue" />} metric="Total Sessions" value={sessionData.length || 0} />
                 <OverviewCard icon={<Clock className="w-4 h-4 text-therapy-purple" />} metric="This Week" value="3" />
                 <OverviewCard icon={<TrendingUp className="w-4 h-4 text-therapy-green" />} metric="Progress" value="Improving" />
 
